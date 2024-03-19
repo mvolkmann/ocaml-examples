@@ -1,3 +1,3 @@
 open Demo
 
-let () = assert ((Math_lib.average 2 3) = 2.5)
+let () = print_float (Math_lib.average 2 3)

@@ -1,6 +1,6 @@
 ; For only one test, begin with "(test" and use "(name some_name)".
 ; For multiple tests, begin with "(tests" and use "(names name1 name2)".
 (tests
-   (libraries demo)
-   (names add average)
- )
+  (libraries demo)
+  (names add average)
+)
