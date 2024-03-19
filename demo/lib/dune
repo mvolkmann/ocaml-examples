@@ -1,4 +1,7 @@
 (library
  (name demo)
  (inline_tests)
- (preprocess (pps ppx_inline_test)))
+ ; This only enables inline tests, not expectation tests.
+ ; (preprocess (pps ppx_inline_test)))
+ ; This enables both inline tests and expectation tests.
+ (preprocess (pps ppx_expect)))
