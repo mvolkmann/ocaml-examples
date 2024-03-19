@@ -8,7 +8,7 @@ open My_project.My_math
    that the expression does not return a value. *)
 let () =
   let a = 1 and b = 2 and c = 3 in
-  print_int (MyMath.add a b);
+  print_int (add a b);
   print_newline ();
-  print_float (MyMath.average b c);
+  print_float (average b c);
   print_newline ()
