@@ -1,5 +1,12 @@
-let third_of_4 tuple = match tuple with a, b, c, d -> c;;
+(* Get the second element of a 4-element tuple using destructuring. *)
+let second (_, e, _, _) = e
 
-let t = ("alpha", "beta", "gamma", "delta") in
-print_endline (third_of_4 t)
+(* Get the third element of a 4-element tuple using match. *)
+let third tuple = match tuple with a, b, c, d -> c
+let greek = ("alpha", "beta", "gamma", "delta")
+
+let () =
+  print_endline (second greek);
+  (* beta *)
+  print_endline (third greek)
 (* gamma *)
