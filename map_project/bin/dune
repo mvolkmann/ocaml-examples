@@ -1,0 +1,4 @@
+(executable
+ (public_name map_project)
+ (name main)
+ (libraries map_project uuidm))
