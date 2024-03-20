@@ -12,6 +12,8 @@ let distance (x1, y1) (x2, y2) =
    let dy = y2 -. y1;
    sqrt ((dx *. dx) +. (dy *. dy)) *)
 
+(* So it seems that function bodies must be a single expression. *)
+
 let () =
   let p1 = (0.0, 0.0) in
   let p2 = (1.0, 1.0) in
