@@ -1,4 +1,4 @@
-(* Apparently type names must start lowercase. Why? *)
+(* Type names must start lowercase. *)
 type point2D = float * float (* a tuple *)
 
 let distance (x1, y1) (x2, y2) =
