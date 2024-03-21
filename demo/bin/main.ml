@@ -1,4 +1,4 @@
-(* open Math *)
+(* Note how open requires the library name AND the module name. *)
 open Demo.Math
 open Demo.Points
 open Printf
