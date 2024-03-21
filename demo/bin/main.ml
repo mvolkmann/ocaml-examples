@@ -1,4 +1,5 @@
-open Math_lib
+(* open Math *)
+open Demo.Math_lib
 open Printf
 
 let my_constant = 7
@@ -23,7 +24,7 @@ let () =
 
   (* The remaining examples call functions defined in math.ml. *)
   let a = 2.0 and b = 3.0 and c = 2.5 in
-  printf "sum of a and b = %d\n" (add a b);
+  printf "sum of a and b = %f\n" (add a b);
 
   let numbers = [a; b; c] in
   let avg = average numbers in
