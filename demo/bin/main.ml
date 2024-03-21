@@ -12,6 +12,11 @@ let square x = x * x (* a function *)
    statements and expressions.
    This is where most side effects should occur. *)
 let () =
+  let avg = average [5.2; 3.5] in
+  printf "average = %f\n" avg;
+  let area = Geometry.rectangle_area 5.2 3.5 in
+  printf "area = %f\n" area;
+
   (* This is a verbose way to print a value. *)
   print_string "my_constant = ";
   print_int my_constant;
