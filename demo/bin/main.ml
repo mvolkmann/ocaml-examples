@@ -1,5 +1,6 @@
 (* open Math *)
-open Demo.Math_lib
+open Demo.Math
+open Demo.Points
 open Printf
 
 let my_constant = 7
