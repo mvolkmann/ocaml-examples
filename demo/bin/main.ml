@@ -1,4 +1,4 @@
-open Math
+open Math_lib
 open Printf
 
 let my_constant = 7
@@ -22,7 +22,7 @@ let () =
   printf "square of %d = %d\n" my_constant (square my_constant);
 
   (* The remaining examples call functions defined in math.ml. *)
-  let a = 1 and b = 2 and c = 3 in
+  let a = 2.0 and b = 3.0 and c = 2.5 in
   printf "sum of a and b = %d\n" (add a b);
 
   let numbers = [a; b; c] in
