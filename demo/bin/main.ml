@@ -14,7 +14,7 @@ let square x = x * x (* a function *)
 let () =
   Demo.Sub.Mod.greet ();
   Demo2.Mod.greet ();
-  printf "distance = %f\n" (Demo.Geometry.Mod.distance (0.0, 0.0) (1.0, 1.0));
+  printf "distance = %f\n" (Demo.Geometry.distance (0.0, 0.0) (1.0, 1.0));
 
   let avg = average [5.2; 3.5] in
   printf "average = %f\n" avg;

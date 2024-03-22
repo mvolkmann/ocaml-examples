@@ -2,11 +2,18 @@ open Printf
 
 type season = Spring | Summer | Fall | Winter
 
+module Tense = struct
+  (* It is idiomatic for the main type in a module to be named "t". *)
+  type t = Spring | Sprung | Sprang
+end
+
 let forecast = function
   | Spring -> "rain"
   | Summer -> "sun"
   | Fall -> "nice"
   | Winter -> "snow"
+
+let tense = function Tense.Spring -> 1 | Tense.Sprang -> 2 | Tense.Sprung -> 3
 
 type result = Ok of float | Error of string
 
@@ -29,7 +36,8 @@ let get_string = function
   | BoolVal b -> string_of_bool b
 
 let () =
-  print_endline (forecast Winter);
+  print_endline (forecast Spring);
+  print_int (tense Tense.Spring);
 
   let numerator = 5.0 and denomiator = 0.0 in
   match divide numerator denomiator with
