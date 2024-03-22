@@ -1,0 +1,1 @@
+let greet () = print_endline "Hello, World!"

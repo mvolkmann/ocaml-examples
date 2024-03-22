@@ -5,3 +5,4 @@
  ; (preprocess (pps ppx_inline_test)))
  ; This enables both inline tests and expectation tests.
  (preprocess (pps ppx_expect)))
+ (include_subdirs qualified)

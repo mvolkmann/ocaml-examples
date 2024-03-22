@@ -12,6 +12,9 @@ let square x = x * x (* a function *)
    statements and expressions.
    This is where most side effects should occur. *)
 let () =
+  Demo.Sub.Mod.greet ();
+  Demo2.Mod.greet ();
+
   let avg = average [5.2; 3.5] in
   printf "average = %f\n" avg;
   let area = Geometry.rectangle_area 5.2 3.5 in
