@@ -1,19 +1,20 @@
 open Printf
 
 type season = Spring | Summer | Fall | Winter
+type tense = Spring | Sprung | Sprang
 
-module Tense = struct
-  (* It is idiomatic for the main type in a module to be named "t". *)
-  type t = Spring | Sprung | Sprang
-end
-
-let forecast = function
+(* Since both the season and tense types define a Spring constructor,
+   we need to specify which variant type to use. *)
+let forecast : season -> string = function
   | Spring -> "rain"
   | Summer -> "sun"
   | Fall -> "nice"
   | Winter -> "snow"
 
-let tense = function Tense.Spring -> 1 | Tense.Sprang -> 2 | Tense.Sprung -> 3
+let get_tense : tense -> int = function
+  | Spring -> 1
+  | Sprang -> 2
+  | Sprung -> 3
 
 type result = Ok of float | Error of string
 
@@ -37,7 +38,7 @@ let get_string = function
 
 let () =
   print_endline (forecast Spring);
-  print_int (tense Tense.Spring);
+  print_int (get_tense Spring);
 
   let numerator = 5.0 and denomiator = 0.0 in
   match divide numerator denomiator with
