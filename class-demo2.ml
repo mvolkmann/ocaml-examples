@@ -42,7 +42,9 @@ class rectangle (lower_left_init : point) (width_init : float)
   end
 
 let () =
-  let p = new point 0.0 0.0 in
+  (* TODO: How can I call a named constructor? *)
+  let temp = new point in
+  let p = temp#origin in
   let c = new circle p 5.0 in
   printf "%s area = %f\n" c#name c#area;
   let r = new rectangle p 10.0 5.0 in
