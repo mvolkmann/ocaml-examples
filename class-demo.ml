@@ -1,6 +1,8 @@
 open Printf
 
 module Geometry = struct
+  (* Arguments passed to a constructor do not require a matching field
+     and can be used in methods. *)
   class point (x_init : float) (y_init : float) =
     (* Can omit "(self)" if there are no references to it. *)
     object (self)

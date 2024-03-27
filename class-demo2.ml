@@ -45,7 +45,6 @@ module Geometry = struct
 end
 
 let () =
-  (* TODO: How can I call a named constructor? *)
   let p = Geometry.origin in
   let c = new Geometry.circle p 5.0 in
   printf "%s area = %f\n" c#name c#area;
