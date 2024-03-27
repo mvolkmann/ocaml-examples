@@ -2,12 +2,15 @@ open Printf
 
 class point (x_init : float) (y_init : float) =
   object
+    (* instance variables *)
     val mutable x : float = x_init
     val mutable y : float = y_init
-    method get_x : float = x
-    method get_y : float = y
-    method set_x (new_x : float) = x <- new_x
-    method set_y (new_y : float) = y <- new_y
+
+    (* methods *)
+    method get_x = x
+    method get_y = y
+    method set_x new_x = x <- new_x
+    method set_y new_y = y <- new_y
 
     method translate dx dy =
       x <- x +. dx;
@@ -20,3 +23,4 @@ let () =
   p#set_y 2.0;
   p#translate 3.0 4.0;
   printf "(%f, %f)\n" p#get_x p#get_y
+(* printf "(%f, %f)\n" p#x p#y *)
