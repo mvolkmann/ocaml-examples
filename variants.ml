@@ -16,8 +16,6 @@ let get_tense : tense -> int = function
   | Sprang -> 2
   | Sprung -> 3
 
-type result = Ok of float | Error of string
-
 let divide x y = if y = 0.0 then Error "Division by zero" else Ok (x /. y)
 
 type my_union = BoolVal of bool | IntVal of int | StringVal of string
@@ -30,6 +28,12 @@ type shape =
 let area = function
   | Circle { radius = r } -> Float.pi *. r *. r
   | Rectangle { width = w; height = h } -> w *. h
+
+let center shape =
+  match shape with
+  | Circle { center = c } -> c
+  | Rectangle { lower_left = x, y; width = w; height = h } ->
+      (x +. (w /. 2.0), y +. (h /. 2.0))
 
 let get_string = function
   | IntVal i -> string_of_int i
@@ -52,6 +56,10 @@ let () =
       in
       printf "c area = %f\n" (area c);
       printf "r area = %f\n" (area r);
+      let x, y = center c in
+      printf "c center = (%f, %f)\n" x y;
+      let x, y = center r in
+      printf "r center = (%f, %f)\n" x y;
 
       let b = BoolVal true in
       let i = IntVal 10 in
