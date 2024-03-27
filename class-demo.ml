@@ -3,8 +3,8 @@ open Printf
 class point (x_init : float) (y_init : float) =
   object
     (* instance variables *)
-    val mutable x : float = x_init
-    val mutable y : float = y_init
+    val mutable x = x_init
+    val mutable y = y_init
 
     (* methods *)
     method get_x = x
