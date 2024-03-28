@@ -1,5 +1,4 @@
-(* The `dune` file must include `hashtables` in the `names` stanza. *)
-(* To run this, enter `dune exec ./hashtable.exe`. *)
+(* See README.md for instructions on running this. *)
 open Printf
 
 type dog = { id : string; name : string; breed : string }
