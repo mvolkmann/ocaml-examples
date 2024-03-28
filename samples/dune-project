@@ -1,5 +1,4 @@
 (lang dune 3.14)
-(name samples)
 (package
  (name samples)
  (depends ocaml dune))
