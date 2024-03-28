@@ -3,7 +3,7 @@ open Printf
 
 type dog = { id : string; name : string; breed : string }
 
-(* 10 is an estimate for the number of entries I will add. *)
+(* 10 is an estimate for the number of entries that will be added. *)
 let dog_map = Hashtbl.create 10
 let generate_uuid () = Uuidm.(v `V4 |> to_string)
 
