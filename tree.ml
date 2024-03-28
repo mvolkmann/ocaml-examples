@@ -2,12 +2,12 @@ open Printf
 
 (* A tree can be empty or it can have a node
    that holds a left tree, a value, and a right tree. *)
-type 'a tree = Empty | Node of 'a tree * 'a * 'a tree
+type 'a tree = Empty | Node of 'a * 'a tree * 'a tree
 
 let rec depth_first_in_order tree =
   match tree with
   | Empty -> () (* do nothing *)
-  | Node (left, value, right) ->
+  | Node (value, left, right) ->
       depth_first_in_order left;
       print_endline value;
       depth_first_in_order right
@@ -17,11 +17,11 @@ let rec depth_first_in_order tree =
    they will appear in sorted order. *)
 let family_tree : string tree =
   Node
-    ( Node (Empty, "Amanda", Empty),
-      "Jeremy",
+    ( "Jeremy",
+      Node ("Amanda", Empty, Empty),
       Node
-        ( Node (Empty, "Mark", Empty),
-          "Meghan",
-          Node (Empty, "RC", Node (Empty, "Tami", Empty)) ) )
+        ( "Meghan",
+          Node ("Mark", Empty, Empty),
+          Node ("RC", Empty, Node ("Tami", Empty, Empty)) ) )
 
 let () = depth_first_in_order family_tree
