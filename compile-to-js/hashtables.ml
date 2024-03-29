@@ -1,8 +1,7 @@
 (* See README.md for instructions on running this. *)
 open Printf
 
-(* type [@warning "-unused-field"] dog = { *)
-type dog = {
+type[@warning "-unused-field"] dog = {
   id : string; (* compiler says this is unused *)
   name : string;
   breed : string

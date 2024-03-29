@@ -1,3 +1,6 @@
 (executables
- (names hashtables)
+ (names hashtables lists)
+ (preprocess (pps ppx_deriving.show))
+ ; This disables "unused-field" errors.
+ (flags (:standard -w -69))
  (libraries uuidm))

@@ -1,0 +1,4 @@
+(executables
+ (names hello)
+ (modes js))
+ ; (libraries uuidm))
