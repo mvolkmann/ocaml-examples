@@ -1,4 +1,5 @@
 type dog = { id : string; name : string; breed : string }
+[@@deriving to_yojson]
 
 let hello who =
   <html>
@@ -8,27 +9,27 @@ let hello who =
   </html>
 
 module StringMap = Map.Make (String)
-let last_id_ref = ref 0
 
-let dog_map_ref = ref StringMap.empty
+let dog_table = Hashtbl.create 10
+[@@deriving yojson]
 
-let add_dog name breed dog_map_ref =
-  let last_id_ref = (!last_id_ref + 1) of
-  let id = string_of_int (!last_id_ref) of
-  let dog = { id; name; breed }
-  dog_map_ref = StringMap.add (int_of_string id) dog !dog_map_ref
+let generate_uuid () = Uuidm.(v `V4 |> to_string)
 
-(* let generate_uuid () = Uuidm.(v `V4 |> to_string)
-let uuid = generate_uuid () in
-  let new_dog_map = StringMap.add uuid dog dog_map *)
+let add_dog name breed =
+  let id = generate_uuid () in
+  Hashtbl.add dog_table id { id; name; breed }
 
+(* let rows () =
+  Hashtbl.fold (fun _ dog acc -> table_row dog :: acc) dog_table [] *)
 
 let () =
+  add_dog "Comet" "Whippet";
+  add_dog "Oscar" "GSP";
   Dream.run ~port:3000
   @@ Dream.logger
   @@ Dream.router [
     Dream.get "/" (fun _ -> Dream.html (hello "World"));
     (* See https://aantron.github.io/dream/#json. *)
-    Dream.get "/dog" (fun _ -> Dream.json (hello "World"));
-    Dream.get "/dogs" (fun _ -> Dream.html (hello "Comet"));
+    Dream.get "/dog" (fun _ -> dog_table |> Yojson.Safe.t |> Dream.json)
+    (* Dream.get "/rows" (fun _ -> Dream.html (rows ())); *)
   ]
