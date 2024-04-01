@@ -7,7 +7,6 @@ type person = { name : string; address : address option }
    Otherwise it returns Some (f x). *)
 let ( let+ ) opt fn = Option.map fn opt
 
-(* This gets the city from a person with an optional address. *)
 let get_city person =
   (let+ address = person.address in
    address.city)
