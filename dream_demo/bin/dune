@@ -2,8 +2,8 @@
  (public_name dream_demo)
  (name main)
  (flags (:standard -w -32) (:standard -w -69))
- (libraries dream_demo dream ppx_deriving_yojson.runtime uuidm yojson)
- (preprocess (pps ppx_deriving.show ppx_deriving_yojson)))
+ (libraries dream ppx_deriving_yojson.runtime uuidm yojson)
+ (preprocess (pps ppx_deriving.show ppx_yojson_conv)))
 
 (rule
   (targets main.ml)
