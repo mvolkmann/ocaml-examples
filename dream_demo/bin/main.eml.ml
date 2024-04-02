@@ -1,3 +1,6 @@
+(* See w-template-logic at
+  https://github.com/aantron/dream/tree/master/example/w-template-logic#files.
+*)
 (* opam install ppx_yojson_conv *)
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
@@ -18,7 +21,6 @@ let dog_name (dog_option : dog option) =
   | None -> ""
   | Some dog -> dog.name
 
-   (* <form hx-disabled-elt="#submit-btn" <% attrs %>> *)
 let form request attrs selected_dog_option =
   <form hx-disabled-elt="#submit-btn" <%s attrs %>>
     <%s! Dream.csrf_tag request %>
@@ -30,7 +32,7 @@ let form request attrs selected_dog_option =
         required
         size="30"
         type="text"
-        value=<%s dog_name selected_dog_option %>
+        value="<%s dog_name selected_dog_option %>"
       />
     </div>
     <div>
@@ -41,21 +43,21 @@ let form request attrs selected_dog_option =
         required
         size="30"
         type="text"
-        value=<%s dog_breed selected_dog_option %>
+        value="<%s dog_breed selected_dog_option %>"
       />
     </div>
     <div class="buttons">
       <button id="submit-btn">
-        <%s if selected_dog_option = None then "Update" else "Add" %>
+        <%s if selected_dog_option = None then "Add" else "Update" %>
       </button>
 
-      begin match selected_dog_option with
-      | None -> ()
-      | Some _ ->
+%     begin match selected_dog_option with
+%     | None -> ()
+%     | Some _ ->
         <button hx-put="/deselect" hx-swap="none" type="button">
           Cancel
         </button>
-      end;
+%     end;
     </div>
   </form>
 
