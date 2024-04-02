@@ -22,7 +22,11 @@ let dog_name (dog_option : dog option) =
   | Some dog -> dog.name
 
 let form request attrs selected_dog_option =
-  <form hx-disabled-elt="#submit-btn" <%s attrs %>>
+  <form
+    hx-disabled-elt="#submit-btn"
+    hx-on::after-request="this.reset()"
+    <%s attrs %>
+  >
     <%s! Dream.csrf_tag request %>
     <div>
       <label for="name">Name</label>
@@ -54,7 +58,7 @@ let form request attrs selected_dog_option =
 %     begin match selected_dog_option with
 %     | None -> ()
 %     | Some _ ->
-        <button hx-put="/deselect" hx-swap="none" type="button">
+        <button hx-get="/deselect" hx-swap="none" type="button">
           Cancel
         </button>
 %     end;
@@ -69,8 +73,12 @@ let add_dog name breed =
   Hashtbl.replace dog_table id dog;
   dog
 
-let dog_row dog =
-  <tr class="on-hover" id=<%s "row" ^ dog.id%> {...attrs}>
+let dog_row dog attrs =
+  <tr
+    class="on-hover"
+    id=<%s "row" ^ dog.id%>
+    <%s attrs %>
+  >
     <td><%s dog.name %></td>
     <td><%s dog.breed %></td>
     <td class="buttons">
@@ -140,18 +148,30 @@ let () =
  
     Dream.get "/table-rows" (fun _ ->
       (* sort based on dog name *)
-      let trs = Hashtbl.fold (fun _ dog acc -> dog_row dog :: acc) dog_table [] in
+      let trs = Hashtbl.fold (fun _ dog acc ->
+        (dog_row dog "") :: acc) dog_table [] in
       (String.concat "" trs) |> Dream.html);
 
     Dream.get "/hello" (fun _ ->
-      "<h1>Hello, World!</h1>" |> Dream.html);
+      "<h1>Hello, World!</h1>" |> Dream.html
+    );
+
+    Dream.get "/deselect" (fun _ ->
+      selected_id := None;
+      Dream.empty `OK ~headers:[("HX-Trigger", "selection-change")]
+    );
+
+    Dream.get "/select/:id" (fun request ->
+      let id = Dream.param request "id" in
+      selected_id := Some id;
+      Dream.empty `OK ~headers:[("HX-Trigger", "selection-change")]
+    );
 
     Dream.post "/dog" (fun request ->
       match%lwt Dream.form request with
       (* The tuples in this list must be in alphabetical order. *)
       | `Ok [("breed", breed); ("name", name)] ->
-        (add_dog name breed)
-        |> dog_row
+        dog_row (add_dog name breed) ""
         |> Dream.html ~status:`Created
       | _ -> Dream.empty `Bad_Request
     );
@@ -167,8 +187,7 @@ let () =
           let updated_dog = {id; name; breed} in
           Hashtbl.replace dog_table id updated_dog;
           selected_id := None;
-          updated_dog
-          |> dog_row
+          dog_row updated_dog "hx-swap-oob=true"
           |> Dream.html ~headers:[("HX-Trigger", "selection-change")]
         | _ -> Dream.empty `Bad_Request
     );
