@@ -1,9 +1,22 @@
 (* opam install ppx_yojson_conv *)
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
+type dog = { id : string; name : string; breed : string }
+[@@deriving yojson]
+
+let dog_breed (dog_option : dog option) =
+  match dog_option with
+  | None -> ""
+  | Some dog -> dog.breed
+
+let dog_name (dog_option : dog option) =
+  match dog_option with
+  | None -> ""
+  | Some dog -> dog.name
+
    (* <form hx-disabled-elt="#submit-btn" <% attrs %>> *)
-let form attrs =
-  <form hx-disabled-elt="#submit-btn">
+let form attrs selected_dog_option =
+  <form hx-disabled-elt="#submit-btn" <%s attrs %>>
     <%s attrs %>
     <div>
       <label for="name">Name</label>
@@ -13,7 +26,7 @@ let form attrs =
         required
         size={30}
         type="text"
-        value={selectedDog?.name ?? ''}
+        value=<%s dog_name selected_dog_option %>>
       />
     </div>
     <div>
@@ -24,7 +37,7 @@ let form attrs =
         required
         size={30}
         type="text"
-        value={selectedDog?.breed ?? ''}
+        value=<%s dog_breed selected_dog_option %>
       />
     </div>
     <div class="buttons">
@@ -36,9 +49,6 @@ let form attrs =
       )}
     </div>
   </form>
-
-type dog = { id : string; name : string; breed : string }
-[@@deriving yojson]
 
 let selected_id = ref None
 
@@ -94,13 +104,16 @@ let () =
   Dream.run ~port:3000
   @@ Dream.logger
   @@ Dream.router [
-    Dream.get "/**" @@ Dream.static "./public";
+    Dream.get "/**" @@ Dream.static "public";
+
     (* Dream.delete("/dog/:id" (fun id ->
       let dog = Hashtbl.find dog_table id in
       match dog with
       | None -> Dream.empty `Not_found
       | Some _ -> Hashtbl.remove dog_table id; Dream.empty `OK
     )); *)
+
+    Dream.get "/" (Dream.from_filesystem "public" "index.html");
 
     Dream.get "/dogs" (fun _ ->
       let json_of_list = [%yojson_of: dog list] in
@@ -112,14 +125,12 @@ let () =
       let attrs = match !selected_id with
       | None -> "hx-post=\"/dog\" hx-target=\"tbody\" hx-swap=\"afterbegin\""
       | Some id -> "hx-put=/dog/" ^ id in
-      let selected_dog = match !selected_id with
+      let selected_dog_option = match !selected_id with
       | None -> None
-      | Some id -> Hashtbl.find id dog_table in
-      (form attrs selected_dog) |> Dream.html)
+      | Some id -> Hashtbl.find_opt dog_table id in
+      (form attrs selected_dog_option) |> Dream.html);
  
-    (* Dream.get "/table-rows" (fun _ ->
+    Dream.get "/table-rows" (fun _ ->
       let trs = Hashtbl.fold (fun _ dog acc -> dog_row dog :: acc) dog_table [] in
-      (String.concat "" trs) |> Dream.html) *)
-
-
+      (String.concat "" trs) |> Dream.html)
   ]
