@@ -130,6 +130,7 @@ let () =
       | Some _ -> Hashtbl.remove dog_table id; Dream.empty `OK
     );
 
+    (* This demonstrates an endpoint that returns JSON. *)
     Dream.get "/dogs" (fun _ ->
       let json_of_list = [%yojson_of: dog list] in
       (json_of_hashtbl json_of_list dog_table)
@@ -188,7 +189,10 @@ let () =
         | _ -> Dream.empty `Bad_Request
     );
 
+    (* This serves index.html by default. *)
     Dream.get "/" (Dream.from_filesystem "public" "index.html");
 
+    (* This assumes all other GET requests are
+       for static files in the public directory. *)
     Dream.get "/**" @@ Dream.static "public";
   ]
