@@ -4,6 +4,10 @@ open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 type dog = { id : string; name : string; breed : string }
 [@@deriving yojson]
 
+let dog_table = Hashtbl.create 10
+
+let selected_id = ref None
+
 let dog_breed (dog_option : dog option) =
   match dog_option with
   | None -> ""
@@ -26,7 +30,7 @@ let form attrs selected_dog_option =
         required
         size={30}
         type="text"
-        value=<%s dog_name selected_dog_option %>>
+        value="<%s dog_name selected_dog_option %>"
       />
     </div>
     <div>
@@ -37,7 +41,7 @@ let form attrs selected_dog_option =
         required
         size={30}
         type="text"
-        value=<%s dog_breed selected_dog_option %>
+        value="<%s dog_breed selected_dog_option %>"
       />
     </div>
     <div class="buttons">
@@ -49,11 +53,6 @@ let form attrs selected_dog_option =
       )}
     </div>
   </form>
-
-let selected_id = ref None
-
-(* This is a Dream "template". *)
-let dog_table = Hashtbl.create 10
 
 let generate_uuid () = Uuidm.(v `V4 |> to_string)
 
@@ -129,6 +128,7 @@ let () =
       | None -> None
       | Some id -> Hashtbl.find_opt dog_table id in
       (form attrs selected_dog_option) |> Dream.html);
+      (* "<div>form does here</div>" |> Dream.html); *)
  
     Dream.get "/table-rows" (fun _ ->
       let trs = Hashtbl.fold (fun _ dog acc -> dog_row dog :: acc) dog_table [] in
