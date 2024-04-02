@@ -152,10 +152,6 @@ let () =
         (dog_row dog "") :: acc) dog_table [] in
       (String.concat "" trs) |> Dream.html);
 
-    Dream.get "/hello" (fun _ ->
-      "<h1>Hello, World!</h1>" |> Dream.html
-    );
-
     Dream.get "/deselect" (fun _ ->
       selected_id := None;
       Dream.empty `OK ~headers:[("HX-Trigger", "selection-change")]
