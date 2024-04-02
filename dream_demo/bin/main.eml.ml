@@ -75,8 +75,8 @@ let dog_row dog =
       >
         ✕
       </button>
-      {/* This selects the dog which triggers a selection-change event,
-          which causes the form to update. */}
+      <!-- This selects the dog which triggers a selection-change event,
+           which causes the form to update. -->
       <button
         class="show-on-hover"
         hx-get={'/select/' + dog.id}
@@ -103,16 +103,12 @@ let () =
   Dream.run ~port:3000
   @@ Dream.logger
   @@ Dream.router [
-    Dream.get "/**" @@ Dream.static "public";
-
     (* Dream.delete("/dog/:id" (fun id ->
       let dog = Hashtbl.find dog_table id in
       match dog with
       | None -> Dream.empty `Not_found
       | Some _ -> Hashtbl.remove dog_table id; Dream.empty `OK
     )); *)
-
-    Dream.get "/" (Dream.from_filesystem "public" "index.html");
 
     Dream.get "/dogs" (fun _ ->
       let json_of_list = [%yojson_of: dog list] in
@@ -132,5 +128,12 @@ let () =
  
     Dream.get "/table-rows" (fun _ ->
       let trs = Hashtbl.fold (fun _ dog acc -> dog_row dog :: acc) dog_table [] in
-      (String.concat "" trs) |> Dream.html)
+      (String.concat "" trs) |> Dream.html);
+
+    Dream.get "/hello" (fun _ ->
+      "<h1>Hello, World!</h1>" |> Dream.html);
+
+    Dream.get "/" (Dream.from_filesystem "public" "index.html");
+
+    Dream.get "/**" @@ Dream.static "public";
   ]
