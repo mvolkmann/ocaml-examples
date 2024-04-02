@@ -19,9 +19,9 @@ let dog_name (dog_option : dog option) =
   | Some dog -> dog.name
 
    (* <form hx-disabled-elt="#submit-btn" <% attrs %>> *)
-let form attrs selected_dog_option =
+let form request attrs selected_dog_option =
   <form hx-disabled-elt="#submit-btn" <%s attrs %>>
-    <!-- %s! Dream.csrf_tag request % -->
+    <%s Dream.csrf_tag request %>
     <div>
       <label for="name">Name</label>
       <input
@@ -30,7 +30,7 @@ let form attrs selected_dog_option =
         required
         size={30}
         type="text"
-        value="<%s dog_name selected_dog_option %>"
+        value=<%s dog_name selected_dog_option %>
       />
     </div>
     <div>
@@ -41,7 +41,7 @@ let form attrs selected_dog_option =
         required
         size={30}
         type="text"
-        value="<%s dog_breed selected_dog_option %>"
+        value=<%s dog_breed selected_dog_option %>
       />
     </div>
     <div class="buttons">
@@ -61,14 +61,14 @@ let add_dog name breed =
   Hashtbl.add dog_table id { id; name; breed }
 
 let dog_row dog =
-  <tr class="on-hover" id="<%s "row" ^ dog.id%>" {...attrs}>
+  <tr class="on-hover" id=<%s "row" ^ dog.id%> {...attrs}>
     <td><%s dog.name %></td>
     <td><%s dog.breed %></td>
     <td class="buttons">
       <button
         class="show-on-hover"
         hx-confirm="Are you sure?"
-        hx-delete={`/dog/${dog.id}`}
+        hx-delete=<%s "/dog/" ^ dog.id%>
         hx-target="closest tr"
         hx-swap="delete"
         type="button"
@@ -79,7 +79,7 @@ let dog_row dog =
            which causes the form to update. -->
       <button
         class="show-on-hover"
-        hx-get={'/select/' + dog.id}
+        hx-get=<%s "/select/" ^ dog.id%>
         hx-swap="none"
         type="button"
       >
@@ -103,12 +103,13 @@ let () =
   Dream.run ~port:3000
   @@ Dream.logger
   @@ Dream.router [
-    (* Dream.delete("/dog/:id" (fun id ->
-      let dog = Hashtbl.find dog_table id in
+    Dream.delete "/dog/:id" (fun request ->
+      let id = Dream.param request "id" in
+      let dog = Hashtbl.find_opt dog_table id in
       match dog with
-      | None -> Dream.empty `Not_found
+      | None -> Dream.empty `Not_Found
       | Some _ -> Hashtbl.remove dog_table id; Dream.empty `OK
-    )); *)
+    );
 
     Dream.get "/dogs" (fun _ ->
       let json_of_list = [%yojson_of: dog list] in
@@ -116,24 +117,42 @@ let () =
       |> Dream.json (* adds Content-Type response header *)
     );
 
-    Dream.get "/form" (fun _ -> 
+    Dream.get "/form" (fun request -> 
       let attrs = match !selected_id with
       | None -> "hx-post=\"/dog\" hx-target=\"tbody\" hx-swap=\"afterbegin\""
       | Some id -> "hx-put=/dog/" ^ id in
       let selected_dog_option = match !selected_id with
       | None -> None
       | Some id -> Hashtbl.find_opt dog_table id in
-      (form attrs selected_dog_option) |> Dream.html);
+      (form request attrs selected_dog_option) |> Dream.html);
       (* "<div>form does here</div>" |> Dream.html); *)
  
     Dream.get "/table-rows" (fun _ ->
+      (* sort based on dog name *)
       let trs = Hashtbl.fold (fun _ dog acc -> dog_row dog :: acc) dog_table [] in
       (String.concat "" trs) |> Dream.html);
 
     Dream.get "/hello" (fun _ ->
       "<h1>Hello, World!</h1>" |> Dream.html);
 
+    Dream.put "/dog/:id" (fun request ->
+      let id = Dream.param request "id" in
+      let dog_option = Hashtbl.find_opt dog_table id in
+      match dog_option with
+      | None -> Dream.empty `Not_Found
+      | Some dog ->
+        match Dream.form request with
+        | `Ok ["name", name; "breed", breed] ->
+          let updated_dog = {id; name; breed} in
+          Hashtbl.replace dog_table id updated_dog;
+          selected_id := None;
+          Dream.set_header "HX-Trigger" "selection-change";
+          updated_dog |> dog_row |> Dream.html
+        | _ -> Dream.empty `Bad_Request
+    );
+
     Dream.get "/" (Dream.from_filesystem "public" "index.html");
 
     Dream.get "/**" @@ Dream.static "public";
+
   ]
