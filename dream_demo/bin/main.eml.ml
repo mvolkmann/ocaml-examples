@@ -107,17 +107,17 @@ let dog_row dog attrs =
 
 let json_of_hashtbl json_of_list h =
   h
-  |> Hashtbl.to_seq_values (* gets sequence of values *)
-  |> List.of_seq (* converts sequence to a list *)
-  |> json_of_list (* converts list to json representation *)
+  |> Hashtbl.to_seq_values
+  |> List.of_seq
+  |> json_of_list
   |> Yojson.Safe.to_string (* converts json representation to string *)
 
-(* See https://aantron.github.io/dream/#json. *)
-(* Dream.json just adds the response header Content-Type: application/json *)
 let () =
-  (* This shows two ways to ignore the return value of a function. *)
-  add_dog "Comet" "Whippet" |> ignore;
-  ignore (add_dog "Oscar" "GSP");
+  (* Add some initial dogs.
+     This shows two ways to ignore the return value of a function. *)
+  ignore (add_dog "Comet" "Whippet");
+  add_dog "Oscar" "German Shorthaired Pointer" |> ignore;
+
   Dream.run ~port:3000
   @@ Dream.logger
   @@ Dream.memory_sessions
@@ -145,13 +145,20 @@ let () =
       | None -> None
       | Some id -> Hashtbl.find_opt dog_table id in
       (form request attrs selected_dog_option) |> Dream.html);
-      (* "<div>form does here</div>" |> Dream.html); *)
  
     Dream.get "/table-rows" (fun _ ->
-      (* sort based on dog name *)
-      let trs = Hashtbl.fold (fun _ dog acc ->
-        (dog_row dog "") :: acc) dog_table [] in
-      (String.concat "" trs) |> Dream.html);
+      let dog_list = dog_table |> Hashtbl.to_seq_values |> List.of_seq in
+      let sorted_list = List.sort
+        (fun a b ->
+          String.compare
+            (String.lowercase_ascii a.name)
+            (String.lowercase_ascii b.name))
+        dog_list in
+      let rows = List.fold_right
+        (fun dog acc -> (dog_row dog "") :: acc)
+        sorted_list
+        [] in
+      (String.concat "" rows) |> Dream.html);
 
     Dream.get "/deselect" (fun _ ->
       selected_id := None;
@@ -180,6 +187,7 @@ let () =
       | None -> Dream.empty `Not_Found
       | Some _ ->
         match%lwt Dream.form request with
+        (* The tuples in this list must be in alphabetical order. *)
         | `Ok [("breed", breed); ("name", name)] ->
           let updated_dog = {id; name; breed} in
           Hashtbl.replace dog_table id updated_dog;
