@@ -3,7 +3,8 @@ open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
    (* <form hx-disabled-elt="#submit-btn" <% attrs %>> *)
 let form attrs =
-   <form hx-disabled-elt="#submit-btn">
+  <form hx-disabled-elt="#submit-btn">
+    <%s attrs %>
     <div>
       <label for="name">Name</label>
       <input
@@ -36,15 +37,10 @@ let form attrs =
     </div>
   </form>
 
-(* let hello who =
-  <html>
-    <body>
-      <h1>Hello, <%s who %>!</h1>
-    </body>
-  </html> *)
-
 type dog = { id : string; name : string; breed : string }
 [@@deriving yojson]
+
+let selected_id = ref None
 
 (* This is a Dream "template". *)
 let dog_table = Hashtbl.create 10
@@ -83,10 +79,6 @@ let dog_row dog =
     </td>
   </tr>
 
-let rows h =
-  let trs = Hashtbl.fold (fun _ dog acc -> dog_row dog :: acc) h [] in
-  String.concat "" trs
-
 let json_of_hashtbl json_of_list h =
   h
   |> Hashtbl.to_seq_values (* gets sequence of values *)
@@ -110,22 +102,24 @@ let () =
       | Some _ -> Hashtbl.remove dog_table id; Dream.empty `OK
     )); *)
 
-    (* Dream.get "/hello" (fun _ -> Dream.html (hello "World")); *)
-
     Dream.get "/dogs" (fun _ ->
       let json_of_list = [%yojson_of: dog list] in
       (json_of_hashtbl json_of_list dog_table)
       |> Dream.json (* adds Content-Type response header *)
     );
 
-    (* Dream.get "/row" (fun _ -> (dog_row my_dog) |> Dream.html); *)
-
     Dream.get "/form" (fun _ -> 
-      let selectedDog = Hashtbl.find selected_id dog_table in
-      let attrs = match selected_id with
+      let attrs = match !selected_id with
       | None -> "hx-post=\"/dog\" hx-target=\"tbody\" hx-swap=\"afterbegin\""
-      | Some id -> "hx-put=/dog/" ^ id
-      (form attrs) |> Dream.html)
+      | Some id -> "hx-put=/dog/" ^ id in
+      let selected_dog = match !selected_id with
+      | None -> None
+      | Some id -> Hashtbl.find id dog_table in
+      (form attrs selected_dog) |> Dream.html)
  
-    Dream.get "/table-rows" (fun _ -> (rows dog_table) |> Dream.html)
+    (* Dream.get "/table-rows" (fun _ ->
+      let trs = Hashtbl.fold (fun _ dog acc -> dog_row dog :: acc) dog_table [] in
+      (String.concat "" trs) |> Dream.html) *)
+
+
   ]
