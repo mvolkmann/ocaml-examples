@@ -107,8 +107,9 @@ let json_of_hashtbl json_of_list h =
 (* See https://aantron.github.io/dream/#json. *)
 (* Dream.json just adds the response header Content-Type: application/json *)
 let () =
-  (* let _ = add_dog "Comet" "Whippet";
-  let _ = add_dog "Oscar" "GSP"; *)
+  (* This shows two ways to ignore the return value of a function. *)
+  add_dog "Comet" "Whippet" |> ignore;
+  ignore (add_dog "Oscar" "GSP");
   Dream.run ~port:3000
   @@ Dream.logger
   @@ Dream.memory_sessions
@@ -147,7 +148,8 @@ let () =
 
     Dream.post "/dog" (fun request ->
       match%lwt Dream.form request with
-      | `Ok [("name", name); ("breed", breed)] ->
+      (* The tuples in this list must be in alphabetical order. *)
+      | `Ok [("breed", breed); ("name", name)] ->
         (add_dog name breed)
         |> dog_row
         |> Dream.html ~status:`Created
@@ -161,7 +163,7 @@ let () =
       | None -> Dream.empty `Not_Found
       | Some _ ->
         match%lwt Dream.form request with
-        | `Ok [("name", name); ("breed", breed)] ->
+        | `Ok [("breed", breed); ("name", name)] ->
           let updated_dog = {id; name; breed} in
           Hashtbl.replace dog_table id updated_dog;
           selected_id := None;
