@@ -21,14 +21,14 @@ let dog_name (dog_option : dog option) =
    (* <form hx-disabled-elt="#submit-btn" <% attrs %>> *)
 let form request attrs selected_dog_option =
   <form hx-disabled-elt="#submit-btn" <%s attrs %>>
-    <%s Dream.csrf_tag request %>
+    <%s! Dream.csrf_tag request %>
     <div>
       <label for="name">Name</label>
       <input
         id="name"
         name="name"
         required
-        size={30}
+        size="30"
         type="text"
         value=<%s dog_name selected_dog_option %>
       />
@@ -39,7 +39,7 @@ let form request attrs selected_dog_option =
         id="breed"
         name="breed"
         required
-        size={30}
+        size="30"
         type="text"
         value=<%s dog_breed selected_dog_option %>
       />
@@ -48,9 +48,14 @@ let form request attrs selected_dog_option =
       <button id="submit-btn">
         <%s if selected_dog_option = None then "Update" else "Add" %>
       </button>
-      <button hx-get="/deselect" hx-swap="none" type="button">
-        Cancel
-      </button>
+
+      begin match selected_dog_option with
+      | None -> ()
+      | Some _ ->
+        <button hx-put="/deselect" hx-swap="none" type="button">
+          Cancel
+        </button>
+      end;
     </div>
   </form>
 
@@ -102,6 +107,7 @@ let () =
   add_dog "Oscar" "GSP";
   Dream.run ~port:3000
   @@ Dream.logger
+  @@ Dream.memory_sessions
   @@ Dream.router [
     Dream.delete "/dog/:id" (fun request ->
       let id = Dream.param request "id" in
@@ -140,15 +146,15 @@ let () =
       let dog_option = Hashtbl.find_opt dog_table id in
       match dog_option with
       | None -> Dream.empty `Not_Found
-      | Some dog ->
+      | Some _ ->
         match%lwt Dream.form request with
-        (* | `Ok ["name", name; "breed", breed] -> *)
-        | `Ok ("name", name) ->
+        | `Ok [("name", name); ("breed", breed)] ->
           let updated_dog = {id; name; breed} in
           Hashtbl.replace dog_table id updated_dog;
           selected_id := None;
-          Dream.set_header "HX-Trigger" "selection-change";
-          updated_dog |> dog_row |> Dream.html
+          updated_dog
+          |> dog_row
+          |> Dream.html ~headers:[("HX-Trigger", "selection-change")]
         | _ -> Dream.empty `Bad_Request
     );
 
