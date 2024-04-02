@@ -21,7 +21,7 @@ let dog_name (dog_option : dog option) =
    (* <form hx-disabled-elt="#submit-btn" <% attrs %>> *)
 let form attrs selected_dog_option =
   <form hx-disabled-elt="#submit-btn" <%s attrs %>>
-    <%s attrs %>
+    <!-- %s! Dream.csrf_tag request % -->
     <div>
       <label for="name">Name</label>
       <input
@@ -45,12 +45,12 @@ let form attrs selected_dog_option =
       />
     </div>
     <div class="buttons">
-      <button id="submit-btn">{selectedId ? 'Update' : 'Add'}</button>
-      {selectedId && (
-        <button hx-get="/deselect" hx-swap="none" type="button">
-          Cancel
-        </button>
-      )}
+      <button id="submit-btn">
+        <%s if selected_dog_option = None then "Update" else "Add" %>
+      </button>
+      <button hx-get="/deselect" hx-swap="none" type="button">
+        Cancel
+      </button>
     </div>
   </form>
 
@@ -61,7 +61,7 @@ let add_dog name breed =
   Hashtbl.add dog_table id { id; name; breed }
 
 let dog_row dog =
-  <tr>
+  <tr class="on-hover" id="<%s "row" ^ dog.id%>" {...attrs}>
     <td><%s dog.name %></td>
     <td><%s dog.breed %></td>
     <td class="buttons">
