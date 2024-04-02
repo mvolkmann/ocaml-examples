@@ -141,8 +141,9 @@ let () =
       match dog_option with
       | None -> Dream.empty `Not_Found
       | Some dog ->
-        match Dream.form request with
-        | `Ok ["name", name; "breed", breed] ->
+        match%lwt Dream.form request with
+        (* | `Ok ["name", name; "breed", breed] -> *)
+        | `Ok ("name", name) ->
           let updated_dog = {id; name; breed} in
           Hashtbl.replace dog_table id updated_dog;
           selected_id := None;
