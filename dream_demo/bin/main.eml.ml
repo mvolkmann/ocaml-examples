@@ -65,7 +65,9 @@ let generate_uuid () = Uuidm.(v `V4 |> to_string)
 
 let add_dog name breed =
   let id = generate_uuid () in
-  Hashtbl.add dog_table id { id; name; breed }
+  let dog = { id; name; breed } in
+  Hashtbl.replace dog_table id dog;
+  dog
 
 let dog_row dog =
   <tr class="on-hover" id=<%s "row" ^ dog.id%> {...attrs}>
@@ -105,8 +107,8 @@ let json_of_hashtbl json_of_list h =
 (* See https://aantron.github.io/dream/#json. *)
 (* Dream.json just adds the response header Content-Type: application/json *)
 let () =
-  add_dog "Comet" "Whippet";
-  add_dog "Oscar" "GSP";
+  (* let _ = add_dog "Comet" "Whippet";
+  let _ = add_dog "Oscar" "GSP"; *)
   Dream.run ~port:3000
   @@ Dream.logger
   @@ Dream.memory_sessions
@@ -127,7 +129,7 @@ let () =
 
     Dream.get "/form" (fun request -> 
       let attrs = match !selected_id with
-      | None -> "hx-post=\"/dog\" hx-target=\"tbody\" hx-swap=\"afterbegin\""
+      | None -> "hx-post=/dog hx-target=tbody hx-swap=afterbegin"
       | Some id -> "hx-put=/dog/" ^ id in
       let selected_dog_option = match !selected_id with
       | None -> None
@@ -142,6 +144,15 @@ let () =
 
     Dream.get "/hello" (fun _ ->
       "<h1>Hello, World!</h1>" |> Dream.html);
+
+    Dream.post "/dog" (fun request ->
+      match%lwt Dream.form request with
+      | `Ok [("name", name); ("breed", breed)] ->
+        (add_dog name breed)
+        |> dog_row
+        |> Dream.html ~status:`Created
+      | _ -> Dream.empty `Bad_Request
+    );
 
     Dream.put "/dog/:id" (fun request ->
       let id = Dream.param request "id" in
@@ -163,5 +174,4 @@ let () =
     Dream.get "/" (Dream.from_filesystem "public" "index.html");
 
     Dream.get "/**" @@ Dream.static "public";
-
   ]
