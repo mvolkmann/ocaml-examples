@@ -1,7 +1,7 @@
 (* See w-template-logic at
   https://github.com/aantron/dream/tree/master/example/w-template-logic#files.
 *)
-(* opam install ppx_yojson_conv *)
+(* To uses this, run "opam install ppx_yojson_conv". *)
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
 type dog = { id : string; name : string; breed : string }
@@ -11,15 +11,8 @@ let dog_table = Hashtbl.create 10
 
 let selected_id = ref None
 
-let dog_breed (dog_option : dog option) =
-  match dog_option with
-  | None -> ""
-  | Some dog -> dog.breed
-
-let dog_name (dog_option : dog option) =
-  match dog_option with
-  | None -> ""
-  | Some dog -> dog.name
+let dog_name = Option.fold ~some:(fun dog -> dog.name) ~none:""
+let dog_breed = Option.fold ~some:(fun dog -> dog.breed) ~none:""
 
 let form request attrs selected_dog_option =
   <form
@@ -76,7 +69,7 @@ let add_dog name breed =
 let dog_row dog attrs =
   <tr
     class="on-hover"
-    id=<%s "row" ^ dog.id%>
+    id="row-<%s dog.id%>"
     <%s attrs %>
   >
     <td><%s dog.name %></td>
