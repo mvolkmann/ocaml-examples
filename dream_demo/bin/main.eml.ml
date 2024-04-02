@@ -11,8 +11,49 @@ let dog_table = Hashtbl.create 10
 
 let selected_id = ref None
 
-let dog_name = Option.fold ~some:(fun dog -> dog.name) ~none:""
+let generate_uuid () = Uuidm.(v `V4 |> to_string)
+
+let add_dog name breed =
+  let id = generate_uuid () in
+  let dog = { id; name; breed } in
+  Hashtbl.replace dog_table id dog;
+  dog
+
 let dog_breed = Option.fold ~some:(fun dog -> dog.breed) ~none:""
+
+let dog_name = Option.fold ~some:(fun dog -> dog.name) ~none:""
+
+let dog_row dog attrs =
+  <tr
+    class="on-hover"
+    id="row-<%s dog.id%>"
+    <%s attrs %>
+  >
+    <td><%s dog.name %></td>
+    <td><%s dog.breed %></td>
+    <td class="buttons">
+      <button
+        class="show-on-hover"
+        hx-confirm="Are you sure?"
+        hx-delete=<%s "/dog/" ^ dog.id%>
+        hx-target="closest tr"
+        hx-swap="delete"
+        type="button"
+      >
+        ✕
+      </button>
+      <!-- This selects the dog which triggers a selection-change event,
+           which causes the form to update. -->
+      <button
+        class="show-on-hover"
+        hx-get=<%s "/select/" ^ dog.id%>
+        hx-swap="none"
+        type="button"
+      >
+        ✎
+      </button>
+    </td>
+  </tr>
 
 let form request attrs selected_dog_option =
   <form
@@ -58,46 +99,6 @@ let form request attrs selected_dog_option =
     </div>
   </form>
 
-let generate_uuid () = Uuidm.(v `V4 |> to_string)
-
-let add_dog name breed =
-  let id = generate_uuid () in
-  let dog = { id; name; breed } in
-  Hashtbl.replace dog_table id dog;
-  dog
-
-let dog_row dog attrs =
-  <tr
-    class="on-hover"
-    id="row-<%s dog.id%>"
-    <%s attrs %>
-  >
-    <td><%s dog.name %></td>
-    <td><%s dog.breed %></td>
-    <td class="buttons">
-      <button
-        class="show-on-hover"
-        hx-confirm="Are you sure?"
-        hx-delete=<%s "/dog/" ^ dog.id%>
-        hx-target="closest tr"
-        hx-swap="delete"
-        type="button"
-      >
-        ✕
-      </button>
-      <!-- This selects the dog which triggers a selection-change event,
-           which causes the form to update. -->
-      <button
-        class="show-on-hover"
-        hx-get=<%s "/select/" ^ dog.id%>
-        hx-swap="none"
-        type="button"
-      >
-        ✎
-      </button>
-    </td>
-  </tr>
-
 let json_of_hashtbl json_of_list h =
   h
   |> Hashtbl.to_seq_values
@@ -112,8 +113,13 @@ let () =
   add_dog "Oscar" "German Shorthaired Pointer" |> ignore;
 
   Dream.run ~port:3000
+  (* This logs all HTTP requests in terminal where this is running. *)
   @@ Dream.logger
+
+  (* A session middleware is required.
+     Other options are cookie_sessions and sql_sessions. *)
   @@ Dream.memory_sessions
+
   @@ Dream.router [
     Dream.delete "/dog/:id" (fun request ->
       let id = Dream.param request "id" in
@@ -121,6 +127,11 @@ let () =
       match dog with
       | None -> Dream.empty `Not_Found
       | Some _ -> Hashtbl.remove dog_table id; Dream.empty `OK
+    );
+
+    Dream.get "/deselect" (fun _ ->
+      selected_id := None;
+      Dream.empty `OK ~headers:[("HX-Trigger", "selection-change")]
     );
 
     (* This demonstrates an endpoint that returns JSON. *)
@@ -139,6 +150,12 @@ let () =
       | Some id -> Hashtbl.find_opt dog_table id in
       (form request attrs selected_dog_option) |> Dream.html);
  
+    Dream.get "/select/:id" (fun request ->
+      let id = Dream.param request "id" in
+      selected_id := Some id;
+      Dream.empty `OK ~headers:[("HX-Trigger", "selection-change")]
+    );
+
     Dream.get "/table-rows" (fun _ ->
       let dog_list = dog_table |> Hashtbl.to_seq_values |> List.of_seq in
       let sorted_list = List.sort
@@ -152,17 +169,6 @@ let () =
         sorted_list
         [] in
       (String.concat "" rows) |> Dream.html);
-
-    Dream.get "/deselect" (fun _ ->
-      selected_id := None;
-      Dream.empty `OK ~headers:[("HX-Trigger", "selection-change")]
-    );
-
-    Dream.get "/select/:id" (fun request ->
-      let id = Dream.param request "id" in
-      selected_id := Some id;
-      Dream.empty `OK ~headers:[("HX-Trigger", "selection-change")]
-    );
 
     Dream.post "/dog" (fun request ->
       match%lwt Dream.form request with
@@ -194,6 +200,7 @@ let () =
     Dream.get "/" (Dream.from_filesystem "public" "index.html");
 
     (* This assumes all other GET requests are
-       for static files in the public directory. *)
+       for static files in the public directory.
+       It must appear after all the other routes. *)
     Dream.get "/**" @@ Dream.static "public";
   ]
