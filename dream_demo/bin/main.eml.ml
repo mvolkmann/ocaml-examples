@@ -65,7 +65,7 @@ let () =
       let selected_dog_option = match !selected_id with
       | None -> None
       | Some id -> Hashtbl.find_opt dog_table id in
-        Dream.param request attrs selected_dog_option |> Form.render |> Dream.html
+        Form.render request attrs selected_dog_option |> Dream.html
     );
  
     Dream.get "/select/:id" (fun request ->
