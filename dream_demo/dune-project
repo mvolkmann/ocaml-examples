@@ -5,22 +5,19 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github mvolkmann/ocaml-examples))
 
-(authors "Author Name")
-
-(maintainers "Maintainer Name")
-
+(authors "R. Mark Volkmann")
+(maintainers "R. Mark Volkmann")
 (license LICENSE)
-
-(documentation https://url/to/documentation)
+(documentation https://github.com/mvolkmann/ocaml-examples/tree/main/dream_demo)
 
 (package
  (name dream_demo)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "Dream htmx web app")
+ (description "This is a Dream-based web app that demonstrates using htmx.")
  (depends ocaml dune)
  (tags
-  (topics "to describe" your project)))
+  (topics "Dream" "htmx" "web")))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
