@@ -62,10 +62,10 @@ let () =
       let attrs = match !selected_id with
       | None -> "hx-post=/dog hx-target=tbody hx-swap=afterbegin"
       | Some id -> "hx-put=/dog/" ^ id in
-      let selected_dog_option = match !selected_id with
+      let selected_dog_opt = match !selected_id with
       | None -> None
       | Some id -> Hashtbl.find_opt dog_table id in
-        Form.render request attrs selected_dog_option |> Dream.html
+        Form.render request attrs selected_dog_opt |> Dream.html
     );
  
     Dream.get "/select/:id" (fun request ->
@@ -101,8 +101,8 @@ let () =
 
     Dream.put "/dog/:id" (fun request ->
       let id = Dream.param request "id" in
-      let dog_option = Hashtbl.find_opt dog_table id in
-      match dog_option with
+      let dog_opt = Hashtbl.find_opt dog_table id in
+      match dog_opt with
       | None -> Dream.empty `Not_Found
       | Some _ ->
         match%lwt Dream.form request with
