@@ -84,7 +84,7 @@ let () =
             (String.lowercase_ascii b.name))
         dog_list in
       let rows = List.fold_right
-        (fun dog acc -> (Dream.param dog "" |> Dog_row.render) :: acc)
+        (fun dog acc -> Dog_row.render dog "" :: acc)
         sorted_list
         [] in
       (String.concat "" rows) |> Dream.html);
