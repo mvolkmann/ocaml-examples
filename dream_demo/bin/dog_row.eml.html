@@ -1,31 +1,27 @@
 let render dog attrs =
-  <tr
-    class="on-hover"
-    id="row-<%s dog.id%>"
-    <%s attrs %>
+<tr class="on-hover" id="row-<%s dog.Dog.id%>" <%s attrs %>
   >
-    <td><%s dog.name %></td>
-    <td><%s dog.breed %></td>
-    <td class="buttons">
-      <button
-        class="show-on-hover"
-        hx-confirm="Are you sure?"
-        hx-delete=<%s "/dog/" ^ dog.id%>
-        hx-target="closest tr"
-        hx-swap="delete"
-        type="button"
+  <td>
+    <%s dog.name %>
+  </td>
+  <td>
+    <%s dog.breed %>
+  </td>
+  <td class="buttons">
+    <button class="show-on-hover" hx-confirm="Are you sure?" hx-delete=<%s "/dog/" ^ dog.id%>
+      hx-target="closest tr"
+      hx-swap="delete"
+      type="button"
       >
-        ✕
-      </button>
-      <!-- This selects the dog which triggers a selection-change event,
+      ✕
+    </button>
+    <!-- This selects the dog which triggers a selection-change event,
            which causes the form to update. -->
-      <button
-        class="show-on-hover"
-        hx-get=<%s "/select/" ^ dog.id%>
-        hx-swap="none"
-        type="button"
+    <button class="show-on-hover" hx-get=<%s "/select/" ^ dog.id%>
+      hx-swap="none"
+      type="button"
       >
-        ✎
-      </button>
-    </td>
-  </tr>
+      ✎
+    </button>
+  </td>
+</tr>

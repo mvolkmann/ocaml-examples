@@ -4,9 +4,6 @@
 (* To uses this, run "opam install ppx_yojson_conv". *)
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
-type dog = { id : string; name : string; breed : string }
-[@@deriving yojson]
-
 let dog_table = Hashtbl.create 10
 
 let selected_id = ref None
@@ -15,13 +12,9 @@ let generate_uuid () = Uuidm.(v `V4 |> to_string)
 
 let add_dog name breed =
   let id = generate_uuid () in
-  let dog = { id; name; breed } in
+  let dog = { Dog.id; name; breed } in
   Hashtbl.replace dog_table id dog;
   dog
-
-let dog_breed = Option.fold ~some:(fun dog -> dog.breed) ~none:""
-
-let dog_name = Option.fold ~some:(fun dog -> dog.name) ~none:""
 
 let json_of_hashtbl json_of_list h =
   h
@@ -60,7 +53,7 @@ let () =
 
     (* This demonstrates an endpoint that returns JSON. *)
     Dream.get "/dogs" (fun _ ->
-      let json_of_list = [%yojson_of: dog list] in
+      let json_of_list = [%yojson_of: Dog.t list] in
       (json_of_hashtbl json_of_list dog_table)
       |> Dream.json (* adds Content-Type response header *)
     );
