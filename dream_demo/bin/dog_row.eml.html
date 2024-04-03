@@ -1,5 +1,9 @@
-let render dog attrs =
-<tr class="on-hover" id="row-<%s dog.Dog.id %>" <%s attrs %>>
+(* As an alternative to specifying the type of the `dog` parameter,
+you can change `dog.id` on the next line to `dog.Dog.id`.
+After that, you can get the name and breed without
+adding `.Dog` because OCaml already knows it is a Dog. *)
+let render (dog : Dog.t) (attrs : string) =
+<tr class="on-hover" id="row-<%s dog.id %>" <%s attrs %>>
   <td>
     <%s dog.name %>
   </td>
