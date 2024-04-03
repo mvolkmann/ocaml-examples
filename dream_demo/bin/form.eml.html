@@ -14,8 +14,8 @@ let render request attrs selected_dog_option =
         <%s if selected_dog_option=None then "Add" else "Update" %>
       </button>
 
-      % begin match selected_dog_option with % | None -> () % | Some _ ->
-      <button hx-get="/deselect" hx-swap="none" type="button">Cancel</button>
-      % end;
+      <% begin match selected_dog_option with | None -> () | Some _ -> %>
+        <button hx-get="/deselect" hx-swap="none" type="button">Cancel</button>
+        <% end; %>
     </div>
 </form>
