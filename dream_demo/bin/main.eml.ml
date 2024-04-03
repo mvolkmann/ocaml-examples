@@ -79,7 +79,8 @@ let () =
       let sorted_list = List.sort
         (fun a b ->
           String.compare
-            (String.lowercase_ascii a.name)
+            (* TODO: may be better to write a custom in Dog module *)
+            (String.lowercase_ascii a.Dog.name)
             (String.lowercase_ascii b.name))
         dog_list in
       let rows = List.fold_right
