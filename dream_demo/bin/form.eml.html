@@ -1,0 +1,21 @@
+let render request attrs selected_dog_option =
+<form hx-disabled-elt="#submit-btn" hx-on::after-request="this.reset()" <%s attrs %>
+  > <%s! Dream.csrf_tag request %>
+    <div>
+      <label for="name">Name</label>
+      <input id="name" name="name" required size="30" type="text" value="<%s Dog.name selected_dog_option %>" />
+    </div>
+    <div>
+      <label for="breed">Breed</label>
+      <input id="breed" name="breed" required size="30" type="text" value="<%s Dog.breed selected_dog_option %>" />
+    </div>
+    <div class="buttons">
+      <button id="submit-btn">
+        <%s if selected_dog_option=None then "Add" else "Update" %>
+      </button>
+
+      <% begin match selected_dog_option with | None -> () | Some _ -> %>
+        <button hx-get="/deselect" hx-swap="none" type="button">Cancel</button>
+        <% end; %>
+    </div>
+</form>

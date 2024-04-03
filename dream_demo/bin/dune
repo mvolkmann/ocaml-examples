@@ -9,3 +9,13 @@
   (targets main.ml)
   (deps main.eml.ml)
   (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
+(rule
+  (targets form.ml)
+  (deps form.eml.html)
+  (action (run dream_eml %{deps} --workspace %{workspace_root})))
+
+(rule
+  (targets dog_row.ml)
+  (deps dog_row.eml.html)
+  (action (run dream_eml %{deps} --workspace %{workspace_root})))
