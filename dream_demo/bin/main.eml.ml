@@ -108,7 +108,7 @@ let () =
         match%lwt Dream.form request with
         (* The tuples in this list must be in alphabetical order. *)
         | `Ok [("breed", breed); ("name", name)] ->
-          let updated_dog = {id; name; breed} in
+          let updated_dog = {Dog.id; name; breed} in
           Hashtbl.replace dog_table id updated_dog;
           selected_id := None;
           Dog_row.render updated_dog "hx-swap-oob=true"
