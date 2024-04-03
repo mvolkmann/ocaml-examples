@@ -1,7 +1,10 @@
 let render request attrs selected_dog_opt =
-<form hx-disabled-elt="#submit-btn" hx-on::after-request="this.reset()" <%s
-  attrs %>
-  > <%s! Dream.csrf_tag request %>
+<form
+  hx-disabled-elt="#submit-btn"
+  hx-on::after-request="this.reset()"
+  <%s attrs %>
+  >
+  <%s! Dream.csrf_tag request %>
     <div>
       <label for="name">Name</label>
       <input
