@@ -23,82 +23,6 @@ let dog_breed = Option.fold ~some:(fun dog -> dog.breed) ~none:""
 
 let dog_name = Option.fold ~some:(fun dog -> dog.name) ~none:""
 
-let dog_row dog attrs =
-  <tr
-    class="on-hover"
-    id="row-<%s dog.id%>"
-    <%s attrs %>
-  >
-    <td><%s dog.name %></td>
-    <td><%s dog.breed %></td>
-    <td class="buttons">
-      <button
-        class="show-on-hover"
-        hx-confirm="Are you sure?"
-        hx-delete=<%s "/dog/" ^ dog.id%>
-        hx-target="closest tr"
-        hx-swap="delete"
-        type="button"
-      >
-        ✕
-      </button>
-      <!-- This selects the dog which triggers a selection-change event,
-           which causes the form to update. -->
-      <button
-        class="show-on-hover"
-        hx-get=<%s "/select/" ^ dog.id%>
-        hx-swap="none"
-        type="button"
-      >
-        ✎
-      </button>
-    </td>
-  </tr>
-
-let form request attrs selected_dog_option =
-  <form
-    hx-disabled-elt="#submit-btn"
-    hx-on::after-request="this.reset()"
-    <%s attrs %>
-  >
-    <%s! Dream.csrf_tag request %>
-    <div>
-      <label for="name">Name</label>
-      <input
-        id="name"
-        name="name"
-        required
-        size="30"
-        type="text"
-        value="<%s dog_name selected_dog_option %>"
-      />
-    </div>
-    <div>
-      <label for="breed">Breed</label>
-      <input
-        id="breed"
-        name="breed"
-        required
-        size="30"
-        type="text"
-        value="<%s dog_breed selected_dog_option %>"
-      />
-    </div>
-    <div class="buttons">
-      <button id="submit-btn">
-        <%s if selected_dog_option = None then "Add" else "Update" %>
-      </button>
-
-%     begin match selected_dog_option with
-%     | None -> ()
-%     | Some _ ->
-        <button hx-get="/deselect" hx-swap="none" type="button">
-          Cancel
-        </button>
-%     end;
-    </div>
-  </form>
-
 let json_of_hashtbl json_of_list h =
   h
   |> Hashtbl.to_seq_values
@@ -148,7 +72,8 @@ let () =
       let selected_dog_option = match !selected_id with
       | None -> None
       | Some id -> Hashtbl.find_opt dog_table id in
-      (form request attrs selected_dog_option) |> Dream.html);
+        Dream.param request attrs selected_dog_option |> Form.render |> Dream.html
+    );
  
     Dream.get "/select/:id" (fun request ->
       let id = Dream.param request "id" in
@@ -165,7 +90,7 @@ let () =
             (String.lowercase_ascii b.name))
         dog_list in
       let rows = List.fold_right
-        (fun dog acc -> (dog_row dog "") :: acc)
+        (fun dog acc -> (Dream.param dog "" |> Dog_row.render) :: acc)
         sorted_list
         [] in
       (String.concat "" rows) |> Dream.html);
@@ -174,7 +99,8 @@ let () =
       match%lwt Dream.form request with
       (* The tuples in this list must be in alphabetical order. *)
       | `Ok [("breed", breed); ("name", name)] ->
-        dog_row (add_dog name breed) ""
+        let new_dog = add_dog name breed in
+        Dog_row.render new_dog ""
         |> Dream.html ~status:`Created
       | _ -> Dream.empty `Bad_Request
     );
@@ -191,7 +117,7 @@ let () =
           let updated_dog = {id; name; breed} in
           Hashtbl.replace dog_table id updated_dog;
           selected_id := None;
-          dog_row updated_dog "hx-swap-oob=true"
+          Dog_row.render updated_dog "hx-swap-oob=true"
           |> Dream.html ~headers:[("HX-Trigger", "selection-change")]
         | _ -> Dream.empty `Bad_Request
     );
