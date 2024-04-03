@@ -5,17 +5,8 @@
  (libraries dream ppx_deriving_yojson.runtime uuidm yojson)
  (preprocess (pps lwt_ppx ppx_deriving.show ppx_yojson_conv)))
 
+; We could specify a separate rule for each .eml file.
 (rule
-  (targets main.ml)
-  (deps main.eml.ml)
-  (action (run dream_eml %{deps} --workspace %{workspace_root})))
-
-(rule
-  (targets form.ml)
-  (deps form.eml.html)
-  (action (run dream_eml %{deps} --workspace %{workspace_root})))
-
-(rule
-  (targets dog_row.ml)
-  (deps dog_row.eml.html)
+  (targets main.ml form.ml dog_row.ml)
+  (deps main.eml.ml form.eml.html dog_row.eml.html)
   (action (run dream_eml %{deps} --workspace %{workspace_root})))
