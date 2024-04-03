@@ -7,8 +7,13 @@ let render dog attrs =
     <%s dog.breed %>
   </td>
   <td class="buttons">
-    <button class="show-on-hover" hx-confirm="Are you sure?" hx-delete="/dog/<%s dog.id%>" hx-target="closest tr"
-      hx-swap="delete" type="button">
+    <button
+      class="show-on-hover"
+      hx-confirm="Are you sure?"
+      hx-delete="/dog/<%s dog.id%>"
+      hx-target="closest tr"
+      hx-swap="delete"
+      type="button">
       ✕
     </button>
     <!-- This selects the dog which triggers a selection-change event,
