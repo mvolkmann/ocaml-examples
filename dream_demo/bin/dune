@@ -5,8 +5,9 @@
  (libraries dream ppx_deriving_yojson.runtime uuidm yojson)
  (preprocess (pps lwt_ppx ppx_deriving.show ppx_yojson_conv)))
 
-; We could specify a separate rule for each .eml file.
+; The dialect stanza in dune-project should make this unnecessary,
+; but it doesn't.
 (rule
-  (targets main.ml form.ml dog_row.ml)
-  (deps main.eml.ml form.eml.html dog_row.eml.html)
+  (targets form.ml dog_row.ml)
+  (deps form.eml.html dog_row.eml.html)
   (action (run dream_eml %{deps} --workspace %{workspace_root})))
