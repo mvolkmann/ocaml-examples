@@ -22,10 +22,12 @@
 
 ; This is an attempt to specify how all `.eml.html` files should be processed.
 ; It is not working.
-(dialect
- (name eml)
- (implementation
-  (extension eml.html)
-  (preprocess
-   (run dream_eml %{input-file} --workspace %{workspace_root}))))
+; Running "dune test" doesn't work with this.
+; (dialect
+;  (name eml)
+;  (implementation
+;   (extension eml.html)
+;   (preprocess
+;    (run dream_eml %{input-file} --workspace %{workspace_root}))))
+
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
