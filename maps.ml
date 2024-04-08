@@ -12,10 +12,6 @@ let add_dog name breed dog_map_ref =
   let dog = { id; name; breed } in
   dog_map_ref := StringMap.add id dog !dog_map_ref
 
-let print_map map =
-  StringMap.iter map ~f:(fun ~key ~data ->
-      Printf.printf "Key: %s, Value: %d\n" key data)
-
 let () =
   let map =
     StringMap.empty |> StringMap.add "a" "apple" |> StringMap.add "b" "banana"
@@ -30,6 +26,6 @@ let () =
 
       add_dog "Comet" "Whippet" dog_map_ref;
       add_dog "Oscar" "GSP" dog_map_ref;
-      let dog_map = !dog_map_ref in
-      (* Print the key/value pairs in dog_map_ref. *)
-      StringMap.iter (fun key value -> printf "%s: %s\n" key value) dog_map
+      StringMap.iter
+        (fun key dog -> printf "%s: %s is a %s.\n" key dog.name dog.breed)
+        !dog_map_ref
