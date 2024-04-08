@@ -5,6 +5,9 @@
  (libraries dream ppx_deriving_yojson.runtime uuidm yojson)
  (preprocess (pps lwt_ppx ppx_deriving.show ppx_expect ppx_yojson_conv)))
 
+(library
+  (public_name dream_demo))
+
 ; The dialect stanza in dune-project should make this unnecessary,
 ; but it doesn't.
 (rule
