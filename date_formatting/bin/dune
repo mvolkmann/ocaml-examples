@@ -1,4 +1,4 @@
 (executable
  (public_name date_formatting)
  (name main)
- (libraries date_formatting odate))
+ (libraries date_formatting odate timedesc))

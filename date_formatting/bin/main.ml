@@ -12,8 +12,16 @@ let date_printer =
   | Some p -> p
   | None -> failwith "could not generate printer"
 
+let now () = Unix.(() |> time |> localtime)
+
+let format_date { Unix.tm_year; tm_mon; tm_mday; _ } =
+  Printf.sprintf "%4d-%02d-%02d" (tm_year + 1900) (tm_mon + 1) tm_mday
+
 let () =
-  let now = Date.now() in
-  let s = Date.To.string date_printer now in
-  print_endline s
+  let n = Date.now() in
+  let s = Date.To.string date_printer n in
+  print_endline s;
+
+  let s2 = format_date (now ()) in
+  print_endline s2
 
