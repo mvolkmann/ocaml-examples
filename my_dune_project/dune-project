@@ -1,7 +1,4 @@
 (lang dune 3.14)
-
-(name my_dune_project)
-
 (package
  (name my_dune_project)
  (depends ocaml dune))
