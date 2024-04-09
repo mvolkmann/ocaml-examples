@@ -1,4 +1,3 @@
-open Odoc_demo
 open Printf
 
 let () =

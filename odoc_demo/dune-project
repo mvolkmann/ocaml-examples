@@ -1,2 +1,4 @@
 (lang dune 3.14)
 (name my_math)
+(generate_opam_files true)
+(package (name my_math))
