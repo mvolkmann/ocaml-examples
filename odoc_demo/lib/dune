@@ -1,2 +1,2 @@
 (library
- (public_name odoc_demo))
+ (public_name my_math))

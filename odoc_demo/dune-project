@@ -1,9 +1,2 @@
 (lang dune 3.14)
-
-(name odoc_demo)
-
-(generate_opam_files true)
-
-(package
- (name odoc_demo)
- (depends ocaml dune))
+(name my_math)
