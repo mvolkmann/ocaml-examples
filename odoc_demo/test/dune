@@ -1,2 +1,4 @@
-(test
- (name test_odoc_demo))
+(library
+ (name test_lib)
+ (public_name test_lib)
+ (libraries my_math))
