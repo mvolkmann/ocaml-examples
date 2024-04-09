@@ -1,9 +1,4 @@
 (executable
  (public_name odoc_demo)
  (name main)
- (libraries my_math))
-
-(test
- (name test_lib)
- (libraries my_math)
- (modules test_lib))
+ (libraries odoc_demo))
