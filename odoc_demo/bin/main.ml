@@ -1,7 +1,7 @@
-open My_math
+open Odoc_demo
 open Printf
 
 let () =
-  let sum = sum2 3 4 in
-  let product = product2 3 4 in
+  let sum = My_math.sum2 3 4 in
+  let product = My_math.product2 3 4 in
   printf "sum = %d, product = %d\n" sum product
