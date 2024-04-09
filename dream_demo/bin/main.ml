@@ -8,13 +8,6 @@ let dog_table = Hashtbl.create 10
 let selected_id = ref None
 let generate_uuid () = Uuidm.(v `V4 |> to_string)
 
-(**
- * [add_dog name breed] creates a dog record,
- * adds it to dog_table, and returns it.
- * @param name the dog name
- * @param breed the dog breed
- * @return a dog record
- *)
 let add_dog name breed =
   let id = generate_uuid () in
   let dog = { Dog.id; name; breed } in

@@ -1,0 +1,4 @@
+(executable
+ (public_name odoc_demo)
+ (name main)
+ (libraries my_math))
