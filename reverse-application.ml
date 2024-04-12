@@ -21,7 +21,8 @@ let () =
   let total =
     cart
     |> List.fold_left (fun acc item -> acc + item.price) 0
-    |> float_of_int |> ( *. ) 0.01
+    |> float_of_int
+    |> ( *. ) 0.01
     |> ( *. ) (1. +. tax_rate)
   in
   printf "Total: $%.2f\n" total
