@@ -1,6 +1,11 @@
 (executables
- (names hashtables lists)
+ ; Can run these with `dune exec -- ht`, and so on.
+ ; If this stanza is included, it must contain
+ ; the same number of names as in the names stanza.
+ (public_names ht ls tz)
+ ; Can run these with `dune exec ./hashtables.exe`, and so on.
+ (names hashtables lists time_zone)
  (preprocess (pps ppx_deriving.show))
  ; This disables "unused-field" errors.
  (flags (:standard -w -69))
- (libraries uuidm))
+ (libraries core_unix uuidm))
