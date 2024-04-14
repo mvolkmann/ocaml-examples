@@ -8,4 +8,4 @@
  (preprocess (pps ppx_deriving.show))
  ; This disables "unused-field" errors.
  (flags (:standard -w -69))
- (libraries core_unix uuidm))
+ (libraries core core_unix.time_unix uuidm))
