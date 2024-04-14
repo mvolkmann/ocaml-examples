@@ -3,7 +3,7 @@ open Core
 let () =
   (* Including %! at the end of the format string flushes the output buffer. *)
   printf "Enter a timezone: %!";
-  (* Enter a value like "America/Chicago" or "Europe/London". *)
+  (* Enter a value like "America/New_York" or "Europe/London". *)
   match In_channel.(input_line stdin) with
   (* Pressing return without entering text gives Some "", not None. *)
   | None -> failwith "No timezone was provided"
