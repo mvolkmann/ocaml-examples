@@ -1,16 +1,15 @@
 open Core
 
-let readline () = In_channel.input_line In_channel.stdin
-
 let () =
-  (* Is there another function I could use that would not
-     require flushing the buffer with %! ? *)
+  (* Including %! at the end of the format string flushes the output buffer. *)
   printf "Enter a timezone: %!";
   (* Enter a value like "America/Chicago" or "Europe/London". *)
-  match readline () with
+  match In_channel.(input_line stdin) with
   (* Pressing return without entering text gives Some "", not None. *)
   | None -> failwith "No timezone was provided"
   | Some zone_string ->
+      (* The package Time_float_unix is defined in the Core_unix library,
+         but through some magic it is found without mentioning that library. *)
       let open Time_float_unix in
       let now = Time_float.now () in
       (* Can I make this work with timezone abbreviations
