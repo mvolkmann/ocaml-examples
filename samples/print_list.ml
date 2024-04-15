@@ -6,5 +6,6 @@ let print_int_list l =
 
 let () =
   let numbers = [ 1; 2; 3 ] in
+  (* This demonstrates two ways to print a list. *)
   print_int_list numbers;
   print_endline (show_int_list numbers)
