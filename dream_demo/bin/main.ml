@@ -23,6 +23,10 @@ let delete_dog request =
       Hashtbl.remove dog_table id;
       Dream.empty `OK
 
+let deselect_dog _ =
+  selected_id := None;
+  Dream.empty `OK ~headers:[ ("HX-Trigger", "selection-change") ])
+
 let json_of_hashtbl json_of_list h =
   h
   |> Hashtbl.to_seq_values
@@ -45,9 +49,7 @@ let () =
   @@ Dream.router
        [
          Dream.delete "/dog/:id" delete_dog;
-         Dream.get "/deselect" (fun _ ->
-             selected_id := None;
-             Dream.empty `OK ~headers:[ ("HX-Trigger", "selection-change") ]);
+         Dream.get "/deselect" deselect_dog;
          (* This demonstrates an endpoint that returns JSON. *)
          Dream.get "/dogs" (fun _ ->
              let json_of_list = [%yojson_of: Dog.t list] in
