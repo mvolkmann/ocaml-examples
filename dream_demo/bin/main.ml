@@ -47,7 +47,7 @@ let get_dogs_json _ =
   json_of_hashtbl json_of_list dog_table
   |> Dream.json (* adds Content-Type response header *)
 
-let get_form request =
+let form request =
   let attrs =
     match !selected_id with
     | None -> "hx-post=/dog hx-target=tbody hx-swap=afterbegin"
@@ -115,7 +115,7 @@ let () =
          Dream.get "/deselect" deselect_dog;
          (* This demonstrates an endpoint that returns JSON. *)
          Dream.get "/dogs" get_dogs_json;
-         Dream.get "/form" get_form;
+         Dream.get "/form" form;
          Dream.get "/select/:id" select_dog;
          Dream.get "/table-rows" table_rows;
          Dream.post "/dog" create_dog;
