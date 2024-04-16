@@ -103,7 +103,8 @@ let () =
   add_dog "Oscar" "German Shorthaired Pointer" |> ignore;
 
   Dream.run ~port:3000
-  (* This logs all HTTP requests in terminal where this is running. *)
+  (* This middleware logs all HTTP requests in the terminal where this is
+     running. *)
   @@ Dream.logger
   (* A session middleware is required. Other options are cookie_sessions and
      sql_sessions. *)
