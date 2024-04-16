@@ -14,6 +14,15 @@ let add_dog name breed =
   Hashtbl.replace dog_table id dog;
   dog
 
+let delete_dog request =
+  let id = Dream.param request "id" in
+  let dog = Hashtbl.find_opt dog_table id in
+  match dog with
+  | None -> Dream.empty `Not_Found
+  | Some _ ->
+      Hashtbl.remove dog_table id;
+      Dream.empty `OK
+
 let json_of_hashtbl json_of_list h =
   h
   |> Hashtbl.to_seq_values
@@ -35,14 +44,7 @@ let () =
   @@ Dream.memory_sessions
   @@ Dream.router
        [
-         Dream.delete "/dog/:id" (fun request ->
-             let id = Dream.param request "id" in
-             let dog = Hashtbl.find_opt dog_table id in
-             match dog with
-             | None -> Dream.empty `Not_Found
-             | Some _ ->
-                 Hashtbl.remove dog_table id;
-                 Dream.empty `OK);
+         Dream.delete "/dog/:id" delete_dog;
          Dream.get "/deselect" (fun _ ->
              selected_id := None;
              Dream.empty `OK ~headers:[ ("HX-Trigger", "selection-change") ]);
