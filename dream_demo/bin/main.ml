@@ -87,7 +87,9 @@ let update_dog request =
   | None -> Dream.empty `Not_Found
   | Some _ -> (
       match%lwt Dream.form request with
-      (* The tuples in this list must be in alphabetical order. *)
+      (* The tuples in this list must be in alphabetical order. The
+         "Bad_Request" response below is returned if the form data does not
+         contain "breed" and "name". *)
       | `Ok [ ("breed", breed); ("name", name) ] ->
           let updated_dog = { Dog.id; name; breed } in
           Hashtbl.replace dog_table id updated_dog;
@@ -102,27 +104,27 @@ let () =
   ignore (add_dog "Comet" "Whippet");
   add_dog "Oscar" "German Shorthaired Pointer" |> ignore;
 
-  Dream.run ~port:3000
-  (* This middleware logs all HTTP requests in the terminal where this is
-     running. *)
-  @@ Dream.logger
+  Dream.router
+    [
+      Dream.delete "/dog/:id" delete_dog;
+      Dream.get "/deselect" deselect_dog;
+      (* This demonstrates an endpoint that returns JSON. *)
+      Dream.get "/dogs" get_dogs_json;
+      Dream.get "/form" form;
+      Dream.get "/select/:id" select_dog;
+      Dream.get "/table-rows" table_rows;
+      Dream.post "/dog" create_dog;
+      Dream.put "/dog/:id" update_dog;
+      (* This serves index.html by default. *)
+      Dream.get "/" (Dream.from_filesystem "public" "index.html");
+      (* This assumes all other GET requests are for static files in the public
+         directory. It must appear after all the other routes. *)
+      Dream.get "/**" @@ Dream.static "public";
+    ]
   (* A session middleware is required. Other options are cookie_sessions and
      sql_sessions. *)
-  @@ Dream.memory_sessions
-  @@ Dream.router
-       [
-         Dream.delete "/dog/:id" delete_dog;
-         Dream.get "/deselect" deselect_dog;
-         (* This demonstrates an endpoint that returns JSON. *)
-         Dream.get "/dogs" get_dogs_json;
-         Dream.get "/form" form;
-         Dream.get "/select/:id" select_dog;
-         Dream.get "/table-rows" table_rows;
-         Dream.post "/dog" create_dog;
-         Dream.put "/dog/:id" update_dog;
-         (* This serves index.html by default. *)
-         Dream.get "/" (Dream.from_filesystem "public" "index.html");
-         (* This assumes all other GET requests are for static files in the
-            public directory. It must appear after all the other routes. *)
-         Dream.get "/**" @@ Dream.static "public";
-       ]
+  |> Dream.memory_sessions
+  (* This middleware logs all HTTP requests in the terminal where this is
+     running. *)
+  |> Dream.logger
+  |> Dream.run ~port:3000
