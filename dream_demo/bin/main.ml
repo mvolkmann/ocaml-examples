@@ -1,6 +1,5 @@
 (* See w-template-logic at
-   https://github.com/aantron/dream/tree/master/example/w-template-logic#files.
-*)
+   https://github.com/aantron/dream/tree/master/example/w-template-logic#files. *)
 (* To uses this, run "opam install ppx_yojson_conv". *)
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
@@ -15,20 +14,23 @@ let add_dog name breed =
   dog
 
 let json_of_hashtbl json_of_list h =
-  h |> Hashtbl.to_seq_values |> List.of_seq |> json_of_list
+  h
+  |> Hashtbl.to_seq_values
+  |> List.of_seq
+  |> json_of_list
   |> Yojson.Safe.to_string (* converts json representation to string *)
 
 let () =
-  (* Add some initial dogs.
-     This shows two ways to ignore the return value of a function. *)
+  (* Add some initial dogs. This shows two ways to ignore the return value of a
+     function. *)
   ignore (add_dog "Comet" "Whippet");
   add_dog "Oscar" "German Shorthaired Pointer" |> ignore;
 
   Dream.run ~port:3000
   (* This logs all HTTP requests in terminal where this is running. *)
   @@ Dream.logger
-  (* A session middleware is required.
-     Other options are cookie_sessions and sql_sessions. *)
+  (* A session middleware is required. Other options are cookie_sessions and
+     sql_sessions. *)
   @@ Dream.memory_sessions
   @@ Dream.router
        [
@@ -106,8 +108,7 @@ let () =
                  | _ -> Dream.empty `Bad_Request));
          (* This serves index.html by default. *)
          Dream.get "/" (Dream.from_filesystem "public" "index.html");
-         (* This assumes all other GET requests are
-            for static files in the public directory.
-            It must appear after all the other routes. *)
+         (* This assumes all other GET requests are for static files in the
+            public directory. It must appear after all the other routes. *)
          Dream.get "/**" @@ Dream.static "public";
        ]

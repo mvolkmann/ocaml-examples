@@ -1,2 +1,6 @@
 profile = default
 version = 0.26.1
+break-infix = fit-or-vertical
+if-then-else = fit-or-vertical
+parse-docstrings = true
+wrap-comments = true
