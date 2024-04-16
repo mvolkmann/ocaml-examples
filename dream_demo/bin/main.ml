@@ -1,6 +1,7 @@
 (* See w-template-logic at
    https://github.com/aantron/dream/tree/master/example/w-template-logic#files. *)
 (* To uses this, run "opam install ppx_yojson_conv". *)
+open My_lib
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
 let dog_table = Hashtbl.create 10
@@ -72,7 +73,6 @@ let () =
                List.sort
                  (fun a b ->
                    String.compare
-                     (* TODO: may be better to write a custom in Dog module *)
                      (String.lowercase_ascii a.Dog.name)
                      (String.lowercase_ascii b.name))
                  dog_list

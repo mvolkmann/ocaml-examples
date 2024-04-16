@@ -1,0 +1,12 @@
+(library
+ (name my_lib)
+  (inline_tests)
+  (libraries dream ppx_deriving_yojson.runtime yojson)
+  (preprocess (pps ppx_expect ppx_yojson_conv)))
+
+; The dialect stanza in dune-project should make this unnecessary,
+; but it doesn't.
+(rule
+  (targets form.ml dog_row.ml)
+  (deps form.eml.html dog_row.eml.html)
+  (action (run dream_eml %{deps} --workspace %{workspace_root})))

@@ -2,15 +2,5 @@
  (public_name dream_demo)
  (name main)
  (flags (:standard -w -32) (:standard -w -69))
- (libraries dream ppx_deriving_yojson.runtime uuidm yojson)
+ (libraries dream my_lib ppx_deriving_yojson.runtime uuidm yojson)
  (preprocess (pps lwt_ppx ppx_deriving.show ppx_expect ppx_yojson_conv)))
-
-(library
-  (public_name dream_demo))
-
-; The dialect stanza in dune-project should make this unnecessary,
-; but it doesn't.
-(rule
-  (targets form.ml dog_row.ml)
-  (deps form.eml.html dog_row.eml.html)
-  (action (run dream_eml %{deps} --workspace %{workspace_root})))
