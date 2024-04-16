@@ -21,6 +21,14 @@ let add_dog name breed =
   Hashtbl.replace dog_table id dog;
   dog
 
+let create_dog request =
+  match%lwt Dream.form request with
+  (* The tuples in this list must be in alphabetical order. *)
+  | `Ok [ ("breed", breed); ("name", name) ] ->
+      let new_dog = add_dog name breed in
+      Dog_row.render new_dog "" |> Dream.html ~status:`Created
+  | _ -> Dream.empty `Bad_Request
+
 let delete_dog request =
   let id = Dream.param request "id" in
   let dog = Hashtbl.find_opt dog_table id in
@@ -52,6 +60,42 @@ let get_form request =
   in
   Form.render request attrs selected_dog_opt |> Dream.html
 
+let select_dog request =
+  let id = Dream.param request "id" in
+  selected_id := Some id;
+  Dream.empty `OK ~headers:[ ("HX-Trigger", "selection-change") ]
+
+let table_rows _ =
+  let dog_list = dog_table |> Hashtbl.to_seq_values |> List.of_seq in
+  let sorted_list =
+    List.sort
+      (fun a b ->
+        String.compare
+          (String.lowercase_ascii a.Dog.name)
+          (String.lowercase_ascii b.name))
+      dog_list
+  in
+  let rows =
+    List.fold_right (fun dog acc -> Dog_row.render dog "" :: acc) sorted_list []
+  in
+  String.concat "" rows |> Dream.html
+
+let update_dog request =
+  let id = Dream.param request "id" in
+  let dog_opt = Hashtbl.find_opt dog_table id in
+  match dog_opt with
+  | None -> Dream.empty `Not_Found
+  | Some _ -> (
+      match%lwt Dream.form request with
+      (* The tuples in this list must be in alphabetical order. *)
+      | `Ok [ ("breed", breed); ("name", name) ] ->
+          let updated_dog = { Dog.id; name; breed } in
+          Hashtbl.replace dog_table id updated_dog;
+          selected_id := None;
+          Dog_row.render updated_dog "hx-swap-oob=true"
+          |> Dream.html ~headers:[ ("HX-Trigger", "selection-change") ]
+      | _ -> Dream.empty `Bad_Request)
+
 let () =
   (* Add some initial dogs. This shows two ways to ignore the return value of a
      function. *)
@@ -71,49 +115,10 @@ let () =
          (* This demonstrates an endpoint that returns JSON. *)
          Dream.get "/dogs" get_dogs_json;
          Dream.get "/form" get_form;
-         Dream.get "/select/:id" (fun request ->
-             let id = Dream.param request "id" in
-             selected_id := Some id;
-             Dream.empty `OK ~headers:[ ("HX-Trigger", "selection-change") ]);
-         Dream.get "/table-rows" (fun _ ->
-             let dog_list = dog_table |> Hashtbl.to_seq_values |> List.of_seq in
-             let sorted_list =
-               List.sort
-                 (fun a b ->
-                   String.compare
-                     (String.lowercase_ascii a.Dog.name)
-                     (String.lowercase_ascii b.name))
-                 dog_list
-             in
-             let rows =
-               List.fold_right
-                 (fun dog acc -> Dog_row.render dog "" :: acc)
-                 sorted_list []
-             in
-             String.concat "" rows |> Dream.html);
-         Dream.post "/dog" (fun request ->
-             match%lwt Dream.form request with
-             (* The tuples in this list must be in alphabetical order. *)
-             | `Ok [ ("breed", breed); ("name", name) ] ->
-                 let new_dog = add_dog name breed in
-                 Dog_row.render new_dog "" |> Dream.html ~status:`Created
-             | _ -> Dream.empty `Bad_Request);
-         Dream.put "/dog/:id" (fun request ->
-             let id = Dream.param request "id" in
-             let dog_opt = Hashtbl.find_opt dog_table id in
-             match dog_opt with
-             | None -> Dream.empty `Not_Found
-             | Some _ -> (
-                 match%lwt Dream.form request with
-                 (* The tuples in this list must be in alphabetical order. *)
-                 | `Ok [ ("breed", breed); ("name", name) ] ->
-                     let updated_dog = { Dog.id; name; breed } in
-                     Hashtbl.replace dog_table id updated_dog;
-                     selected_id := None;
-                     Dog_row.render updated_dog "hx-swap-oob=true"
-                     |> Dream.html
-                          ~headers:[ ("HX-Trigger", "selection-change") ]
-                 | _ -> Dream.empty `Bad_Request));
+         Dream.get "/select/:id" select_dog;
+         Dream.get "/table-rows" table_rows;
+         Dream.post "/dog" create_dog;
+         Dream.put "/dog/:id" update_dog;
          (* This serves index.html by default. *)
          Dream.get "/" (Dream.from_filesystem "public" "index.html");
          (* This assumes all other GET requests are for static files in the
