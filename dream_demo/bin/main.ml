@@ -8,6 +8,13 @@ let dog_table = Hashtbl.create 10
 let selected_id = ref None
 let generate_uuid () = Uuidm.(v `V4 |> to_string)
 
+let json_of_hashtbl json_of_list h =
+  h
+  |> Hashtbl.to_seq_values
+  |> List.of_seq
+  |> json_of_list
+  |> Yojson.Safe.to_string (* converts json representation to string *)
+
 let add_dog name breed =
   let id = generate_uuid () in
   let dog = { Dog.id; name; breed } in
@@ -25,14 +32,25 @@ let delete_dog request =
 
 let deselect_dog _ =
   selected_id := None;
-  Dream.empty `OK ~headers:[ ("HX-Trigger", "selection-change") ])
+  Dream.empty `OK ~headers:[ ("HX-Trigger", "selection-change") ]
 
-let json_of_hashtbl json_of_list h =
-  h
-  |> Hashtbl.to_seq_values
-  |> List.of_seq
-  |> json_of_list
-  |> Yojson.Safe.to_string (* converts json representation to string *)
+let get_dogs_json _ =
+  let json_of_list = [%yojson_of: Dog.t list] in
+  json_of_hashtbl json_of_list dog_table
+  |> Dream.json (* adds Content-Type response header *)
+
+let get_form request =
+  let attrs =
+    match !selected_id with
+    | None -> "hx-post=/dog hx-target=tbody hx-swap=afterbegin"
+    | Some id -> "hx-put=/dog/" ^ id
+  in
+  let selected_dog_opt =
+    match !selected_id with
+    | None -> None
+    | Some id -> Hashtbl.find_opt dog_table id
+  in
+  Form.render request attrs selected_dog_opt |> Dream.html
 
 let () =
   (* Add some initial dogs. This shows two ways to ignore the return value of a
@@ -51,22 +69,8 @@ let () =
          Dream.delete "/dog/:id" delete_dog;
          Dream.get "/deselect" deselect_dog;
          (* This demonstrates an endpoint that returns JSON. *)
-         Dream.get "/dogs" (fun _ ->
-             let json_of_list = [%yojson_of: Dog.t list] in
-             json_of_hashtbl json_of_list dog_table
-             |> Dream.json (* adds Content-Type response header *));
-         Dream.get "/form" (fun request ->
-             let attrs =
-               match !selected_id with
-               | None -> "hx-post=/dog hx-target=tbody hx-swap=afterbegin"
-               | Some id -> "hx-put=/dog/" ^ id
-             in
-             let selected_dog_opt =
-               match !selected_id with
-               | None -> None
-               | Some id -> Hashtbl.find_opt dog_table id
-             in
-             Form.render request attrs selected_dog_opt |> Dream.html);
+         Dream.get "/dogs" get_dogs_json;
+         Dream.get "/form" get_form;
          Dream.get "/select/:id" (fun request ->
              let id = Dream.param request "id" in
              selected_id := Some id;
