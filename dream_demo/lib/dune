@@ -8,5 +8,7 @@
 ; but it doesn't.
 (rule
   (targets form.ml dog_row.ml)
-  (deps form.eml.html dog_row.eml.html)
+  ; I'm not using the recommended file extension .eml.html for these files
+  ; because that causes VS Code break the code due to bad formatting.
+  (deps form.eml dog_row.eml)
   (action (run dream_eml %{deps} --workspace %{workspace_root})))
