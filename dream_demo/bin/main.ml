@@ -2,6 +2,8 @@
    https://github.com/aantron/dream/tree/master/example/w-template-logic#files. *)
 (* To uses this, run "opam install ppx_yojson_conv". *)
 open My_lib
+
+(* This is needed into order to use %yojson_of. *)
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
 let dog_table = Hashtbl.create 10

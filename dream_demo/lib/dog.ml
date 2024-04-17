@@ -5,6 +5,8 @@ type t = { id : string; name : string; breed : string } [@@deriving yojson]
 let breed_of_opt = Option.fold ~some:(fun dog -> dog.breed) ~none:""
 let name_of_opt = Option.fold ~some:(fun dog -> dog.name) ~none:""
 
+(* The rest of this file defines inline tests. *)
+
 let%test "test breed_of_opt with some" =
   breed_of_opt (Some { id = "1"; name = "Buddy"; breed = "Labrador" })
   = "Labrador"
