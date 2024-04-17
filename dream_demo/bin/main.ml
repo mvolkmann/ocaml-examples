@@ -6,6 +6,7 @@ open My_lib
 (* This is needed into order to use %yojson_of. *)
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
+(* The keys are UUID strings and the values are Dog records. *)
 let dog_table = Hashtbl.create 10
 let selected_id = ref None
 let generate_uuid () = Uuidm.(v `V4 |> to_string)
