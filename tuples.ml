@@ -3,15 +3,15 @@ open Printf
 (* Get the second element of a 4-element tuple using destructuring. *)
 let second (_, e, _, _) = e
 
-(* This shows three ways to write a function that
-   returns the third elemet of a 4-element tuple `t`. *)
-let third_of_4 t = match t with a, b, c, d -> c
+(* This shows three ways to write a function that returns the third elemet of a
+   4-element tuple `t`. *)
+(* let third_of_4 t = match t with a, b, c, d -> c *)
 
-(* let third_of_4 t =
-   let _, _, c, _ = t in
-   c *)
+let third_of_4 = function a, b, c, d -> c
 
-let third_of_4 (_, _, v, _) = v
+(* let third_of_4 t = let _, _, c, _ = t in c *)
+
+(* let third_of_4 (_, _, v, _) = v *)
 let greek = ("alpha", "beta", "gamma", "delta")
 
 let () =
