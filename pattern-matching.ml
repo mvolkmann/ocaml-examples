@@ -4,6 +4,7 @@ type color = Red | Green | Blue
 type player = { name : string; number : int; active : bool }
 
 let player = { name = "Wayne Gretzky"; number = 99; active = false }
+let my_tuple = (true, 3)
 
 let () =
   let color = Red in
@@ -18,6 +19,11 @@ let () =
   else
     printf "%s is no longer active.\n" name;
 
-  match player with
-  | { name; active } when not active -> printf "%s is no longer active.\n" name
-  | { name; number } -> printf "%s wears number %d.\n" name number
+  (match player with
+  | { name; active } when not active ->
+      printf "%s is no\n     longer active.\n" name
+  | { name; number } -> printf "%s wears number %d.\n" name number);
+
+  match my_tuple with
+  | (b, n) as t -> Printf.printf "%b, %d, %b, %d\n" b n (fst t) (snd t)
+  | _ -> print_endline "will never happen"
