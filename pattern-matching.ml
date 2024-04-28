@@ -20,11 +20,10 @@ let () =
     printf "%s is no longer active.\n" name;
 
   (match player with
-  | { name; active } when not active ->
+  | { name; active; _ } when not active ->
       printf "%s is no\n     longer active.\n" name
-  | { name; number } -> printf "%s wears number %d.\n" name number);
+  | { name; number; _ } -> printf "%s wears number %d.\n" name number);
 
   (* Note the parens above. *)
   match my_tuple with
   | (b, n) as t -> Printf.printf "%b, %d, %b, %d\n" b n (fst t) (snd t)
-  | _ -> print_endline "will never happen"
